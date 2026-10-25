@@ -1,11 +1,12 @@
 import { Volume2 } from "lucide-react";
 import { useState } from "react";
 import { play } from "../lib/audio";
+import type { Voice } from "../atlas/types";
 
 export function Speak({
   url,
   text,
-  accent = "uk",
+  accent = "us",
   label,
   size = "md",
   rate = 1,
@@ -14,7 +15,7 @@ export function Speak({
 }: {
   url: string | null;
   text: string;
-  accent?: "uk" | "us";
+  accent?: Voice;
   label?: React.ReactNode;
   size?: "sm" | "md" | "lg";
   rate?: number;
@@ -40,7 +41,10 @@ export function Speak({
       title={kbd ? `朗读（${kbd}）` : "朗读"}
     >
       <span className="speak-icon">
-        <Volume2 size={size === "lg" ? 22 : size === "sm" ? 15 : 18} strokeWidth={1.8} />
+        <Volume2
+          size={size === "lg" ? 22 : size === "sm" ? 15 : 18}
+          strokeWidth={1.8}
+        />
         <span className="speak-waves" />
       </span>
       {label && <span className="speak-label">{label}</span>}

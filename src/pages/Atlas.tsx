@@ -23,7 +23,7 @@ const STATUS: [Status, string][] = [
 type View = "grid" | "list" | "galaxy";
 function readView(): View {
   try {
-    const v = localStorage.getItem("word-atlas:view");
+    const v = localStorage.getItem("little-word-atlas:view");
     return v === "list" || v === "galaxy" ? v : "grid";
   } catch {
     return "grid";
@@ -47,7 +47,12 @@ export function AtlasPage({
   );
   // Follow the URL when a link switches views while this page is already open.
   useEffect(() => {
-    if (route.view === "grid" || route.view === "list" || route.view === "galaxy") setViewState(route.view);
+    if (
+      route.view === "grid" ||
+      route.view === "list" ||
+      route.view === "galaxy"
+    )
+      setViewState(route.view);
   }, [route.view]);
   const setView = (v: View) => {
     setViewState(v);
@@ -67,7 +72,7 @@ export function AtlasPage({
 
   useEffect(() => {
     try {
-      localStorage.setItem("word-atlas:view", view);
+      localStorage.setItem("little-word-atlas:view", view);
     } catch {
       /* optional */
     }
@@ -97,14 +102,14 @@ export function AtlasPage({
     <div className={`page atlas ${view === "galaxy" ? "is-galaxy" : ""}`}>
       <header className="atlas-head">
         <div>
-          <p className="eyebrow">图鉴 · {atlas.count.toLocaleString()} 词</p>
+          <p className="eyebrow">双语图鉴 · {atlas.count} 张词卡</p>
           <h1 className="display">
-            每个词，
+            一字一画，
             <br className="br-sm" />
-            都有一幅画。
+            中英一起学。
           </h1>
           <p className="lede">
-            {atlas.examples.toLocaleString()} 条原创例句 · 英美发音 · 按难度和 {atlas.topics.length} 个雅思话题整理
+            汉字、拼音、英文和插画，按 {atlas.topics.length} 个生活主题整理。
           </p>
         </div>
         <label className="search">
@@ -112,7 +117,7 @@ export function AtlasPage({
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="搜索单词或中文释义"
+            placeholder="搜索汉字、拼音或英文"
             spellCheck={false}
             autoComplete="off"
           />
@@ -131,12 +136,16 @@ export function AtlasPage({
       <div className="filters">
         {view !== "galaxy" && (
           <>
-            <div className="chips chips-scroll" role="group" aria-label="难度">
+            <div
+              className="chips chips-scroll"
+              role="group"
+              aria-label="成长阶段"
+            >
               <button
                 className={`chip-btn ${!level ? "is-on" : ""}`}
                 onClick={() => setFilter({ level: undefined })}
               >
-                所有难度
+                所有阶段
               </button>
               {atlas.cefr.map((l) => (
                 <button
@@ -305,7 +314,7 @@ function VirtualGrid({
     Math.floor((width + gap) / ((width < 560 ? 150 : 188) + gap)),
   );
   const cell = (width - gap * (cols - 1)) / cols;
-  const rowH = cell + (width < 560 ? 62 : 74) + gap;
+  const rowH = cell + (width < 560 ? 88 : 100) + gap;
   const rows = Math.ceil(items.length / cols);
   const [a, b] = useWindowRange(box, rowH, rows);
   const visible: React.ReactNode[] = [];
@@ -329,7 +338,12 @@ function VirtualGrid({
               width: cell,
               height: rowH - gap,
             }}
-            onClick={(e) => morphFrom(e.currentTarget.querySelector<HTMLElement>(".illo"), () => openWord(w.id))}
+            onClick={(e) =>
+              morphFrom(
+                e.currentTarget.querySelector<HTMLElement>(".illo"),
+                () => openWord(w.id),
+              )
+            }
           >
             <Illustration
               src={atlas.img(w, "thumb")}
@@ -340,13 +354,18 @@ function VirtualGrid({
               № {String(w.order + 1).padStart(4, "0")}
             </span>
             <span className="tile-text">
-              <span className="tile-word" lang="en">
-                {w.word}
+              <span className="tile-hanzi" lang="zh-CN">
+                {w.hanzi}
               </span>
               <span className={`tile-lv lv-${atlas.cefr[w.cefr]}`}>
                 {atlas.cefr[w.cefr]}
               </span>
-              <span className="tile-zh">{w.zh}</span>
+              <span className="tile-word" lang="en">
+                {w.word}
+              </span>
+              <span className="tile-zh">
+                {w.pinyin} · {w.zh}
+              </span>
             </span>
           </button>,
         );
@@ -366,7 +385,6 @@ function VirtualList({
   cards: Record<string, { s: number; st: number }>;
 }) {
   const atlas = useAtlas();
-  const accent = useStore((s) => s.settings.accent);
   const box = useRef<HTMLDivElement>(null);
   const rowH = 68;
   const [a, b] = useWindowRange(box, rowH, items.length, 8);
@@ -390,18 +408,21 @@ function VirtualList({
               topic={w.topic}
               className="row-art"
             />
+            <span className="row-hanzi" lang="zh-CN">
+              {w.hanzi}
+            </span>
             <span className="row-word" lang="en">
               {w.word}
             </span>
-            <span className="row-ipa ipa">{w.ipa}</span>
+            <span className="row-ipa ipa">{w.pinyin}</span>
             <span className="row-zh">{w.zh}</span>
             <span
               className={`row-dot ${card ? (card.st === 2 && card.s >= 21 ? "is-mastered" : "is-learning") : ""}`}
             />
             <Speak
-              url={atlas.audio(w, accent)}
+              url={atlas.audio(w, "us")}
               text={w.word}
-              accent={accent}
+              accent="us"
               size="sm"
             />
           </div>

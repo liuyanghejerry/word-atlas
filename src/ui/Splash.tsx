@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { duck, playFile, preloadFiles } from "../lib/sound";
+import { playFile, preloadFiles } from "../lib/sound";
 import { dayKey, store } from "../store/store";
 
-const SEEN_KEY = "word-atlas:splash";
+const SEEN_KEY = "little-word-atlas:splash";
 const PALETTE: [string, number][] = [
   ["243,236,223", 0.58],
   ["230,180,87", 0.16],
@@ -74,15 +74,17 @@ function targets(w: number, h: number, count: number) {
   g.font = `700 ${zh}px "Songti SC", "STSong", "Noto Serif SC", "Source Han Serif SC", serif`;
   g.textAlign = "center";
   g.textBaseline = "middle";
-  g.fillText("词光", cx, cy + R + zh * 0.78);
-  const en = Math.max(18, zh * 0.24);
+  g.fillText("芽芽词光", cx, cy + R + zh * 0.78);
+  const en = Math.max(18, zh * 0.2);
   g.font = `700 ${en}px "Fraunces Variable", Georgia, serif`;
-  g.letterSpacing = `${en * 0.34}px`;
-  g.fillText("WORD ATLAS", cx, cy + R + zh * 1.52);
+  g.letterSpacing = `${en * 0.2}px`;
+  g.fillText("LITTLE WORD ATLAS", cx, cy + R + zh * 1.52);
   const data = g.getImageData(0, 0, w, h).data;
   // Take every lit pixel, then a random subset: no visible sampling grid.
   const all: [number, number][] = [];
-  for (let y = 0; y < h; y += 2) for (let x = 0; x < w; x += 2) if (data[(y * w + x) * 4 + 3] > 120) all.push([x, y]);
+  for (let y = 0; y < h; y += 2)
+    for (let x = 0; x < w; x += 2)
+      if (data[(y * w + x) * 4 + 3] > 120) all.push([x, y]);
   const pts: [number, number][] = [];
   for (let i = 0; i < count && all.length; i++) {
     const [x, y] = all[Math.floor(Math.random() * all.length)];
@@ -95,11 +97,16 @@ export function Splash({ onDone }: { onDone: () => void }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const [phase, setPhase] = useState<"gather" | "ready" | "open">("gather");
   const opening = useRef(false);
-  const reduce = typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const reduce =
+    typeof matchMedia !== "undefined" &&
+    matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   useEffect(() => {
-    preloadFiles(["splash-voice.mp3", "splash-door.mp3", "splash-burst.mp3"]);
-    const t = window.setTimeout(() => setPhase((p) => (p === "gather" ? "ready" : p)), reduce ? 300 : 2100);
+    preloadFiles(["splash-door.mp3", "splash-burst.mp3"]);
+    const t = window.setTimeout(
+      () => setPhase((p) => (p === "gather" ? "ready" : p)),
+      reduce ? 300 : 2100,
+    );
     return () => window.clearTimeout(t);
   }, [reduce]);
 
@@ -139,13 +146,21 @@ export function Splash({ onDone }: { onDone: () => void }) {
         vy: 0,
         c: pick(),
         // A few large glowing grains, but keep the small wordmark crisp.
-        r: ty < wordTop && Math.random() < 0.06 ? 2.2 + Math.random() * 1.4 : 0.7 + Math.random() * 1.2,
+        r:
+          ty < wordTop && Math.random() < 0.06
+            ? 2.2 + Math.random() * 1.4
+            : 0.7 + Math.random() * 1.2,
         d: Math.random() * 0.55,
         a: 0.55 + Math.random() * 0.45,
         tw: Math.random() * Math.PI * 2,
       });
     }
-    const stars = Array.from({ length: Math.round((w * h) / 9000) }, () => ({ x: Math.random() * w, y: Math.random() * h, r: Math.random() * 0.9 + 0.2, tw: Math.random() * 6 }));
+    const stars = Array.from({ length: Math.round((w * h) / 9000) }, () => ({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      r: Math.random() * 0.9 + 0.2,
+      tw: Math.random() * 6,
+    }));
     let raf = 0;
     const t0 = performance.now();
     let openAt = 0;
@@ -216,10 +231,7 @@ export function Splash({ onDone }: { onDone: () => void }) {
     if (sound && store.get().settings.sfx) {
       void playFile("splash-burst.mp3", 0.55);
       void playFile("splash-door.mp3", 0.6, 0.12);
-      void playFile("splash-voice.mp3", 0.95, 0.35);
-      // Let the welcome line sit above the music that fades in with the doors.
-      duck(true);
-      window.setTimeout(() => duck(false), 3200);
+      void playFile("voice-welcome-zh.mp3", 0.95, 0.35);
     }
     setPhase("open");
     window.setTimeout(onDone, reduce ? 300 : 1900);
@@ -237,19 +249,24 @@ export function Splash({ onDone }: { onDone: () => void }) {
   }); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className={`splash is-${phase} ${reduce ? "is-reduced" : ""}`} onClick={() => open()} role="dialog" aria-label="欢迎打开雅思大门，点击进入">
+    <div
+      className={`splash is-${phase} ${reduce ? "is-reduced" : ""}`}
+      onClick={() => open()}
+      role="dialog"
+      aria-label="欢迎来到芽芽词光，点击进入"
+    >
       <div className="door door-l" />
       <div className="door door-r" />
       <div className="splash-light" />
       <canvas ref={canvas} className="splash-canvas" aria-hidden="true" />
       {reduce && (
         <div className="splash-static">
-          <b>词光</b>
-          <small>WORD ATLAS</small>
+          <b>芽芽词光</b>
+          <small>LITTLE WORD ATLAS</small>
         </div>
       )}
       <div className="splash-copy">
-        <p className="splash-tag">欢迎打开雅思大门</p>
+        <p className="splash-tag">一字一画，中英一起学</p>
         <p className="splash-hint">
           <span className="splash-key" />
           点击开启 · 按任意键

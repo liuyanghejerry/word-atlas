@@ -5,29 +5,38 @@ import { useAtlas } from "../atlas/context";
 import { openWord } from "../lib/router";
 import { Illustration } from "./Illustration";
 
+const plainPinyin = (value: string) =>
+  value.toLowerCase().normalize("NFD").replace(/[̄́̌̀̈]/g, "").replace(/ü/g, "v");
+
 export function searchAtlas(atlas: Atlas, raw: string, limit = 40): WordRef[] {
-  const q = raw.trim().toLowerCase();
+  const q = plainPinyin(raw.trim());
   if (!q) return [];
-  const zh = /[一-鿿]/.test(q);
   const hits: [number, WordRef][] = [];
   for (const w of atlas.words) {
     let score = 0;
-    if (zh) {
-      const i = w.zh.indexOf(q);
-      if (i >= 0) score = 60 - Math.min(40, i) - w.zh.length * 0.2;
-    } else {
-      const word = w.word.toLowerCase();
-      if (word === q) score = 1000;
-      else if (word.startsWith(q)) score = 500 - word.length;
-      else if (word.includes(q)) score = 200 - word.indexOf(q) - word.length;
-    }
+    const hanzi = w.hanzi ?? "";
+    const zh = `${hanzi} ${w.zh}`;
+    const pinyin = plainPinyin(w.pinyin ?? "");
+    const word = w.word.toLowerCase();
+    if (hanzi === raw.trim() || word === q || pinyin === q.replace(/\s/g, ""))
+      score = 1000;
+    else if (word.startsWith(q) || pinyin.startsWith(q.replace(/\s/g, "")))
+      score = 500 - word.length;
+    else if (zh.includes(raw.trim())) score = 300 - zh.indexOf(raw.trim());
+    else if (word.includes(q)) score = 200 - word.indexOf(q) - word.length;
     if (score > 0) hits.push([score, w]);
   }
   hits.sort((a, b) => b[0] - a[0] || a[1].order - b[1].order);
   return hits.slice(0, limit).map((h) => h[1]);
 }
 
-export function Palette({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function Palette({
+  open,
+  onClose,
+}: {
+  open: boolean;
+  onClose: () => void;
+}) {
   const atlas = useAtlas();
   const [q, setQ] = useState("");
   const [sel, setSel] = useState(0);
@@ -47,14 +56,22 @@ export function Palette({ open, onClose }: { open: boolean; onClose: () => void 
     openWord(w.id);
   };
   return (
-    <div className="palette-root" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="palette" role="dialog" aria-modal="true" aria-label="搜索单词">
+    <div
+      className="palette-root"
+      onMouseDown={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <div
+        className="palette"
+        role="dialog"
+        aria-modal="true"
+        aria-label="搜索词卡"
+      >
         <label className="palette-input">
           <Search size={20} />
           <input
             ref={input}
             value={q}
-            placeholder="搜索英文或中文，例如 serendipity / 环境"
+            placeholder="试一试：日 / sun / ri"
             onChange={(e) => setQ(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Escape") onClose();
@@ -69,7 +86,9 @@ export function Palette({ open, onClose }: { open: boolean; onClose: () => void 
               if (e.key === "Enter" && results[sel]) pick(results[sel]);
             }}
             aria-controls="palette-list"
-            aria-activedescendant={results[sel] ? `pal-${results[sel].id}` : undefined}
+            aria-activedescendant={
+              results[sel] ? `pal-${results[sel].id}` : undefined
+            }
             autoComplete="off"
             spellCheck={false}
           />
@@ -86,19 +105,32 @@ export function Palette({ open, onClose }: { open: boolean; onClose: () => void 
               onMouseEnter={() => setSel(i)}
               onClick={() => pick(w)}
             >
-              <Illustration src={atlas.img(w, "thumb")} word={w.word} topic={w.topic} className="palette-thumb" />
+              <Illustration
+                src={atlas.img(w, "thumb")}
+                word={w.word}
+                topic={w.topic}
+                className="palette-thumb"
+              />
+              <span className="palette-hanzi" lang="zh-CN">
+                {w.hanzi}
+              </span>
               <span className="palette-word" lang="en">
                 {w.word}
               </span>
-              <span className="palette-zh">{w.zh}</span>
-              {i === sel && <CornerDownLeft size={15} className="palette-enter" />}
+              <span className="palette-zh">
+                {w.pinyin} · {w.zh}
+              </span>
+              {i === sel && (
+                <CornerDownLeft size={15} className="palette-enter" />
+              )}
             </li>
           ))}
-          {q && !results.length && <li className="palette-empty">没有找到「{q}」</li>}
+          {q && !results.length && (
+            <li className="palette-empty">没有找到「{q}」，换个词试试。</li>
+          )}
           {!q && (
             <li className="palette-hint">
-              {atlas.count.toLocaleString()} 个词条 · 支持英文前缀与中文释义搜索 · <kbd>↑</kbd>
-              <kbd>↓</kbd> 选择 <kbd>↵</kbd> 打开
+              {atlas.count} 张双语词卡 · 支持汉字、英文和拼音搜索
             </li>
           )}
         </ul>

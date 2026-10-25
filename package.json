@@ -1,8 +1,8 @@
 {
-  "name": "word-atlas",
+  "name": "little-word-atlas",
   "version": "1.0.0",
   "type": "module",
-  "description": "A beautiful, open IELTS vocabulary atlas: 7,000+ illustrated words with UK/US audio, original examples and FSRS spaced repetition.",
+  "description": "A child-friendly Chinese and English vocabulary atlas with 48 illustrated bilingual cards, audio and FSRS review.",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "tsc -b && vite build",

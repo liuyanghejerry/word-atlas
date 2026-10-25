@@ -1,4 +1,5 @@
 import { duck } from "./sound";
+import type { Voice } from "../atlas/types";
 
 let current: HTMLAudioElement | null = null;
 let token = 0;
@@ -11,7 +12,12 @@ export function stopAudio() {
 }
 
 /** Play a recording, falling back to the device voice. Resolves when playback ends. */
-export async function play(url: string | null | undefined, text: string, accent: "uk" | "us" = "uk", rate = 1) {
+export async function play(
+  url: string | null | undefined,
+  text: string,
+  accent: Voice = "us",
+  rate = 1,
+) {
   duck(true);
   try {
     return await speak(url, text, accent, rate);
@@ -20,7 +26,12 @@ export async function play(url: string | null | undefined, text: string, accent:
   }
 }
 
-async function speak(url: string | null | undefined, text: string, accent: "uk" | "us", rate: number) {
+async function speak(
+  url: string | null | undefined,
+  text: string,
+  accent: Voice,
+  rate: number,
+) {
   stopAudio();
   const mine = ++token;
   if (url) {
@@ -41,10 +52,17 @@ async function speak(url: string | null | undefined, text: string, accent: "uk" 
   }
   if (!("speechSynthesis" in window)) return "unsupported" as const;
   const u = new SpeechSynthesisUtterance(text);
-  u.lang = accent === "uk" ? "en-GB" : "en-US";
-  u.rate = rate * 0.95;
-  const voices = speechSynthesis.getVoices().filter((v) => v.lang.replace("_", "-") === u.lang);
-  const best = voices.find((v) => /premium|enhanced|natural|google/i.test(v.name)) || voices[0];
+  u.lang = accent === "zh" ? "zh-CN" : accent === "uk" ? "en-GB" : "en-US";
+  u.rate = rate * (accent === "zh" ? 0.78 : 0.9);
+  const voices = speechSynthesis
+    .getVoices()
+    .filter(
+      (v) => v.lang.replace("_", "-").toLowerCase() === u.lang.toLowerCase(),
+    );
+  const best =
+    voices.find((v) =>
+      /premium|enhanced|natural|google|ting|xiaoxiao/i.test(v.name),
+    ) || voices[0];
   if (best) u.voice = best;
   await new Promise<void>((r) => {
     u.onend = () => r();
