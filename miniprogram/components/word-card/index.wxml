@@ -1,0 +1,60 @@
+<view wx:if="{{entry}}" class="word-card card">
+  <image class="word-art" src="{{image}}" mode="aspectFill" />
+  <view class="word-body">
+    <view class="word-tags">
+      <view>
+        <text class="chip">{{entry.levelName}}</text>
+        <text class="chip">{{entry.topicName}}</text>
+      </view>
+      <button wx:if="{{showActions}}" class="btn-small btn-ghost" bindtap="bookmark">{{saved ? '已收藏' : '收藏'}}</button>
+    </view>
+    <view class="bilingual">
+      <view class="hanzi-side">
+        <text class="hanzi">{{entry.hanzi}}</text>
+        <text class="pinyin">{{entry.pinyin}}</text>
+        <button class="speak" data-kind="zh" bindtap="play">读汉字</button>
+      </view>
+      <view class="english-side">
+        <text class="english">{{entry.w}}</text>
+        <text class="meaning">{{entry.zh}}</text>
+        <button class="speak" data-kind="us" bindtap="play"><text class="speak-icon">听</text> {{entry.us}}</button>
+      </view>
+    </view>
+    <view class="sentence-block">
+      <text class="eyebrow">读一读</text>
+      <view class="sentence">
+        <text class="sentence-badge">中</text>
+        <view class="sentence-text">
+          <text>{{entry.zhEx}}</text>
+          <button class="speak" data-kind="zhEx" bindtap="play">听</button>
+        </view>
+      </view>
+      <view class="sentence">
+        <text class="sentence-badge sentence-badge-en">EN</text>
+        <view class="sentence-text">
+          <text>{{entry.enEx}}</text>
+          <button class="speak" data-kind="enUs" bindtap="play">听</button>
+          <text class="sentence-translation">{{entry.enExZh}}</text>
+        </view>
+      </view>
+    </view>
+    <view class="sentence-block">
+      <text class="eyebrow">词语好朋友</text>
+      <view class="word-friends">
+        <view wx:for="{{entry.words}}" wx:key="*this" class="friend">
+          <text>{{item}}</text>
+          <button class="speak" data-kind="word" data-index="{{index}}" bindtap="play">听</button>
+        </view>
+      </view>
+    </view>
+    <view class="tip">{{entry.tip}}</view>
+    <view wx:if="{{showActions}}" class="actions" style="margin-top:24rpx">
+      <button class="btn btn-secondary" bindtap="share">生成分享卡</button>
+    </view>
+    <view wx:if="{{showActions}}" class="word-nav">
+      <button class="btn btn-ghost" bindtap="previous">上一张</button>
+      <text class="muted">{{entry.order + 1}} / 48</text>
+      <button class="btn btn-ghost" bindtap="next">下一张</button>
+    </view>
+  </view>
+</view>

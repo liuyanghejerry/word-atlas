@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "双语图鉴",
+  "usingComponents": {
+    "galaxy": "/components/galaxy/index"
+  }
+}

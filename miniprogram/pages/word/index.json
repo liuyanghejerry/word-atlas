@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "双语词卡",
+  "usingComponents": {
+    "word-card": "/components/word-card/index"
+  }
+}

@@ -1,0 +1,4 @@
+<view class="container">
+  <word-card entry="{{entry}}" saved="{{saved}}" show-actions bind:bookmark="bookmark" bind:previous="previous" bind:next="next" bind:share="share" />
+</view>
+<canvas type="2d" id="poster" class="poster-canvas" />

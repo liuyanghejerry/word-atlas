@@ -1,0 +1,72 @@
+<view wx:if="{{ready && !summary}}">
+  <view class="learn-top">
+    <button class="learn-close" bindtap="exit">×</button>
+    <view class="progress"><view class="progress-bar" style="width:{{progressPercent}}%" /></view>
+    <text class="learn-count">{{session.index + 1}}/{{session.steps.length}}</text>
+  </view>
+  <view class="stage">
+    <block wx:if="{{step.kind === 'intro'}}">
+      <text class="stage-label">认识新朋友</text>
+      <word-card entry="{{entry}}" />
+      <view class="next-wrap"><button class="btn btn-primary btn-block" bindtap="next">我认识了</button></view>
+    </block>
+    <block wx:else>
+      <text class="stage-label">{{step.retry ? '再试一次 · ' : ''}}{{step.kind === 'meaning' ? '这个汉字，英文怎么说？' : step.kind === 'picture' ? '看图，选出正确的汉字' : step.kind === 'listen' ? '听一听，是哪个英文词？' : '看图，拼出英文单词'}}</text>
+      <view class="prompt">
+        <view wx:if="{{step.kind === 'meaning'}}" style="text-align:center">
+          <text class="prompt-hanzi">{{entry.hanzi}}</text>
+          <button class="speak" bindtap="replay">{{entry.pinyin}} · 听读音</button>
+        </view>
+        <view wx:elif="{{step.kind === 'picture'}}" style="width:100%">
+          <image class="prompt-image" src="{{image}}" mode="aspectFill" />
+          <view class="prompt-title" style="text-align:center">图里是什么？</view>
+        </view>
+        <view wx:elif="{{step.kind === 'listen'}}" style="text-align:center">
+          <button class="listen-orb" bindtap="replay">听</button>
+          <view><button class="btn btn-ghost btn-small" style="margin-top:30rpx" bindtap="replay">再听一遍</button></view>
+        </view>
+        <view wx:else style="text-align:center;width:100%">
+          <image class="typing-image" src="{{image}}" mode="aspectFill" />
+          <view><text class="daily-hanzi">{{entry.hanzi}}</text><text class="pinyin"> {{entry.pinyin}} · {{entry.zh}}</text></view>
+        </view>
+      </view>
+      <view wx:if="{{step.kind !== 'spell'}}" class="options">
+        <button wx:for="{{options}}" wx:key="id" class="option {{step.kind === 'picture' ? 'option-hanzi' : ''}} {{item.state ? 'option-' + item.state : ''}}" data-id="{{item.id}}" bindtap="choose" disabled="{{!!pending}}">{{step.kind === 'picture' ? item.hanzi : item.w}}</button>
+      </view>
+      <view wx:else>
+        <input class="input typing-target" value="{{spellValue}}" bindinput="spellInput" confirm-type="done" bindconfirm="submitSpell" placeholder="输入英文单词" disabled="{{!!pending}}" />
+        <view class="actions" style="margin-top:20rpx">
+          <button class="btn btn-ghost" bindtap="hint">给我一个字母</button>
+          <button class="btn btn-primary" bindtap="submitSpell">写好了</button>
+        </view>
+      </view>
+    </block>
+  </view>
+  <view wx:if="{{pending}}" class="feedback {{pending.correct ? 'feedback-right' : 'feedback-wrong'}}">
+    <view class="feedback-title">{{pending.correct ? '太棒了，答对了！' : '没关系，再记一次就会了'}}</view>
+    <view class="feedback-word"><text class="daily-hanzi">{{entry.hanzi}}</text> {{entry.pinyin}} · {{entry.w}} · {{entry.zh}}</view>
+    <button class="btn btn-primary btn-block" bindtap="next">继续</button>
+  </view>
+</view>
+
+<view wx:if="{{summary}}" class="container summary">
+  <text class="eyebrow">学习小旅程完成啦</text>
+  <text class="display" style="margin-top:20rpx">{{summary.accuracy >= 90 ? '你真棒，闪闪发光！' : '每一次练习都在进步。'}}</text>
+  <text class="summary-score">{{summary.accuracy}}%</text>
+  <text class="muted">首次答对</text>
+  <view class="stats panel" style="margin-top:30rpx">
+    <view class="stat"><text class="stat-value">{{summary.newCount}}</text><text class="stat-label">新词卡</text></view>
+    <view class="stat"><text class="stat-value">{{summary.reviewCount}}</text><text class="stat-label">复习</text></view>
+    <view class="stat"><text class="stat-value">{{summary.minutes}}</text><text class="stat-label">分钟</text></view>
+  </view>
+  <view class="summary-words">
+    <view wx:for="{{summary.words}}" wx:key="id" class="summary-word"><text class="daily-hanzi">{{item.hanzi}}</text><text class="row-pinyin">{{item.w}}</text></view>
+  </view>
+  <view style="margin:30rpx 0"><galaxy words="{{summary.words}}" cards="{{summary.cards}}" highlight="{{summary.todayIds}}" mini /></view>
+  <text class="muted">下次会在快要忘记时再见面。每天一点点，就会记得牢。</text>
+  <view class="actions" style="margin-top:30rpx;justify-content:center">
+    <button wx:if="{{summary.wrong.length}}" class="btn btn-secondary" bindtap="againWrong">再练 {{summary.wrong.length}} 张卡</button>
+    <button class="btn btn-primary" bindtap="finish">完成</button>
+    <button class="btn btn-ghost" open-type="share">分享小成就</button>
+  </view>
+</view>

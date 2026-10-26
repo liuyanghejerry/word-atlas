@@ -1,0 +1,39 @@
+<view class="container">
+  <view class="page-head"><text class="eyebrow">家长中心</text><text class="display">看看孩子的小进步</text></view>
+  <view class="panel stats">
+    <view class="stat"><text class="stat-value">{{stats.learned}}</text><text class="stat-label">已点亮</text></view>
+    <view class="stat"><text class="stat-value">{{stats.mastered}}</text><text class="stat-label">记住了</text></view>
+    <view class="stat"><text class="stat-value">{{stats.accuracy}}%</text><text class="stat-label">首次答对</text></view>
+  </view>
+  <view class="panel">
+    <text class="eyebrow">未来 7 天的复习量</text>
+    <view style="display:flex;align-items:flex-end;justify-content:space-between;height:180rpx;margin-top:24rpx">
+      <view wx:for="{{forecast}}" wx:key="label" style="width:13%;text-align:center">
+        <text class="muted">{{item.count}}</text>
+        <view style="height:110rpx;display:flex;align-items:flex-end;justify-content:center"><view style="width:36rpx;height:{{item.height}}rpx;min-height:8rpx;border-radius:10rpx;background:#8fa9c4"></view></view>
+        <text class="muted">{{item.label}}</text>
+      </view>
+    </view>
+    <text class="muted">累计 {{stats.reviews}} 次练习 · 约 {{stats.minutes}} 分钟</text>
+  </view>
+  <view class="panel">
+    <text class="eyebrow">学习设置</text>
+    <view class="field" style="display:block"><text class="field-label">每日新词卡</text><view class="chips"><button wx:for="{{dailyOptions}}" wx:key="*this" class="chip {{settings.dailyNew === item ? 'chip-active' : ''}}" data-value="{{item}}" bindtap="setDaily">{{item}}</button></view></view>
+    <view class="field" style="display:block"><text class="field-label">学习起点</text><view class="chips"><button wx:for="{{levels}}" wx:key="*this" class="chip {{settings.startLevel === index ? 'chip-active' : ''}}" data-value="{{index}}" bindtap="setLevel">{{item}}</button></view></view>
+    <view class="field" style="display:block"><text class="field-label">目标记忆率<text class="field-hint">越高，复习越频繁</text></text><view class="chips"><button wx:for="{{retentionOptions}}" wx:key="*this" class="chip {{settings.retention === item ? 'chip-active' : ''}}" data-value="{{item}}" bindtap="setRetention">{{item * 100}}%</button></view></view>
+    <view class="field"><text class="field-label">自动播放发音</text><button class="switch {{settings.autoplay ? 'switch-on' : ''}}" data-key="autoplay" bindtap="toggle"><view class="switch-dot" /></button></view>
+    <view class="field"><text class="field-label">界面音效</text><button class="switch {{settings.sfx ? 'switch-on' : ''}}" data-key="sfx" bindtap="toggle"><view class="switch-dot" /></button></view>
+    <view class="field"><text class="field-label">复习时加入英文拼写</text><button class="switch {{settings.spell ? 'switch-on' : ''}}" data-key="spell" bindtap="toggle"><view class="switch-dot" /></button></view>
+    <text class="muted" style="display:block;margin-top:22rpx">汉字、中文短句和组词为普通话合成音频；英文单词和短句统一使用美音。</text>
+  </view>
+  <view class="panel">
+    <text class="eyebrow">数据与备份</text>
+    <text class="muted" style="display:block;margin:16rpx 0 24rpx">没有账号和服务器，进度只存在当前设备。换设备时，复制备份文字，再在这里粘贴恢复。</text>
+    <view class="actions"><button class="btn btn-ghost" bindtap="exportData">复制备份</button><button class="btn btn-ghost" bindtap="importData">粘贴恢复</button><button class="btn btn-ghost" bindtap="reset">清空记录</button></view>
+  </view>
+  <view class="panel">
+    <text class="eyebrow">关于芽芽词光</text>
+    <text class="lede">48 张儿童中英启蒙词卡，六大生活主题。插图与音频全部离线打包，没有广告和追踪。</text>
+    <button class="btn btn-secondary" style="margin-top:22rpx" open-type="share">推荐给其他家长</button>
+  </view>
+</view>

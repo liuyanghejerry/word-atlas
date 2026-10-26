@@ -1,0 +1,45 @@
+<view class="container">
+  <view class="page-head">
+    <text class="eyebrow">英文拼写小练习</text>
+    <text class="display">小手动一动，英文记得牢。</text>
+    <text class="lede">每轮 5 项，不会改变复习进度。</text>
+  </view>
+  <block wx:if="{{!round}}">
+    <view class="panel">
+      <text class="eyebrow">选择模式</text>
+      <view class="mode-grid" style="margin-top:20rpx">
+        <button wx:for="{{modes}}" wx:key="key" class="mode-card {{mode === item.key ? 'mode-active' : ''}}" data-mode="{{item.key}}" bindtap="setMode"><text class="mode-title">{{item.name}}</text><text class="mode-desc">{{item.desc}}</text></button>
+      </view>
+      <text class="eyebrow" style="margin-top:30rpx">词来自</text>
+      <view class="chips"><button wx:for="{{sources}}" wx:key="key" class="chip {{source === item.key ? 'chip-active' : ''}}" data-source="{{item.key}}" bindtap="setSource">{{item.name}}</button></view>
+      <button class="btn btn-primary btn-block" style="margin-top:24rpx" bindtap="start">开始一轮</button>
+    </view>
+    <view class="panel stats">
+      <view class="stat"><text class="stat-value">{{best}}</text><text class="stat-label">最佳 WPM</text></view>
+      <view class="stat"><text class="stat-value">{{rounds}}</text><text class="stat-label">完成轮次</text></view>
+      <view class="stat"><text class="stat-value">5</text><text class="stat-label">每轮词数</text></view>
+    </view>
+  </block>
+  <view wx:elif="{{done}}" class="panel summary">
+    <text class="eyebrow">本轮完成</text>
+    <text class="summary-score">{{metrics.wpm}}</text>
+    <text class="muted">WPM · 准确率 {{metrics.accuracy}}%</text>
+    <view class="actions" style="justify-content:center;margin-top:30rpx"><button class="btn btn-ghost" bindtap="exit">返回</button><button class="btn btn-primary" bindtap="start">再来一轮</button></view>
+  </view>
+  <view wx:elif="{{current}}">
+    <view class="actions" style="justify-content:space-between"><button class="btn btn-ghost btn-small" bindtap="exit">结束</button><text class="muted">{{index + 1}} / {{round.length}} · {{metrics.wpm}} WPM · {{metrics.accuracy}}%</text></view>
+    <view class="progress" style="margin:24rpx 0"><view class="progress-bar" style="width:{{index / round.length * 100}}%" /></view>
+    <view class="panel" style="text-align:center">
+      <image wx:if="{{mode === 'word'}}" class="typing-image" src="{{current.image}}" mode="aspectFill" />
+      <view wx:if="{{mode === 'word'}}"><text class="daily-hanzi">{{current.hanzi}}</text><text class="pinyin">{{current.pinyin}} · {{current.zh}}</text></view>
+      <view wx:else>
+        <text class="lede">{{current.enExZh}}</text>
+        <button wx:if="{{mode === 'dictation'}}" class="btn btn-ghost btn-small" bindtap="replay">再听一遍</button>
+      </view>
+      <view wx:if="{{mode !== 'dictation'}}" class="typing-target">{{current.target}}</view>
+      <view wx:else class="typing-target">听音写短句</view>
+      <input class="input" value="{{value}}" bindinput="input" placeholder="在这里输入" confirm-type="done" />
+      <text class="muted" style="display:block;margin-top:18rpx">全部正确后自动进入下一项</text>
+    </view>
+  </view>
+</view>

@@ -36,6 +36,10 @@ npm run build
 
 The production site is written to `dist/`. For sub-path hosting, run `ATLAS_BASE=/words/ npm run build`.
 
+## WeChat Mini Program
+
+`miniprogram/` contains a native WXML/WXSS/CommonJS version with the same 48 cards, core learning flow and offline media. Import that directory into WeChat DevTools. See [`docs/miniprogram.md`](docs/miniprogram.md) for packaging, validation and device-testing instructions.
+
 ## License
 
 Built on [Word Atlas](https://github.com/designfuchen/word-atlas). Code is [MIT](LICENSE). Original text, illustrations and recordings are [CC BY 4.0](CONTENT_LICENSE.md), credited to “Word Atlas contributors”. New bilingual learning content uses the same content license.

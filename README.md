@@ -69,6 +69,18 @@ npm run build       # 生产构建，输出 dist/
 
 子路径部署：`ATLAS_BASE=/words/ npm run build`。
 
+## 微信小程序
+
+`miniprogram/` 提供同一词库和核心交互的原生微信小程序版本，可直接导入微信开发者工具。全部插画与音频按约 5 MiB 的离线分包提供，不需要资源服务器。
+
+```bash
+npm run pack:miniprogram   # 修改词库后重新同步小程序数据与媒体
+npm run check:miniprogram  # 页面、JS、媒体和分包体积校验
+npm run test:miniprogram   # 小程序单元测试
+```
+
+导入、真机预览与发布说明见 [`docs/miniprogram.md`](docs/miniprogram.md)。
+
 ## 开源与说明
 
 本项目基于 [Word Atlas](https://github.com/designfuchen/word-atlas)。代码采用 [MIT](LICENSE)；原词库文本、插画和录音采用 [CC BY 4.0](CONTENT_LICENSE.md)，署名 “Word Atlas contributors（词光）”。新增儿童双语内容沿用相同内容授权。

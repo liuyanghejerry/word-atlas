@@ -1,0 +1,4 @@
+{
+  "desc": "儿童中英启蒙词卡",
+  "rules": [{ "action": "allow", "page": "*" }]
+}

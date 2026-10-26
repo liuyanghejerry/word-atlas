@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "学习小旅程",
+  "usingComponents": {
+    "word-card": "/components/word-card/index",
+    "galaxy": "/components/galaxy/index"
+  }
+}

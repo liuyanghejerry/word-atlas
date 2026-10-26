@@ -1,0 +1,82 @@
+<view class="container">
+  <view class="page-head">
+    <text class="eyebrow">一字一画，中英一起学</text>
+    <text class="display">你好，小小探索家。</text>
+  </view>
+  <view class="hero">
+    <image class="hero-art" src="{{heroImage}}" mode="aspectFill" />
+    <view class="hero-body">
+      <text class="eyebrow" style="color:#f7e7c4">{{active ? '小旅程进行中' : '今日小旅程'}}</text>
+      <text class="hero-title" wx:if="{{active}}">还剩 {{active.steps.length - active.index}} 小步</text>
+      <text class="hero-title" wx:elif="{{plan.due.length + plan.fresh.length > 0}}">复习 {{plan.due.length}} · 新词卡 {{plan.fresh.length}}</text>
+      <text class="hero-title" wx:else>今天的小星星都亮了</text>
+      <text class="hero-copy">看一看，听一听，再选一选。</text>
+      <view class="teaser" wx:if="{{teaser.length}}">
+        <image wx:for="{{teaser}}" wx:key="id" src="{{item.image}}" />
+        <text>今天会遇见它们</text>
+      </view>
+      <view class="actions">
+        <button class="btn btn-primary" bindtap="start">{{active ? '继续小旅程' : '开始今天的小旅程'}}</button>
+        <button wx:if="{{!active && plan.due.length && plan.fresh.length}}" class="btn btn-ghost" data-review="1" bindtap="start">只复习</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="card daily" bindtap="openDaily">
+    <image src="{{dailyImage}}" mode="aspectFill" />
+    <view class="daily-body">
+      <text class="eyebrow">今日一词</text>
+      <view style="margin-top:22rpx"><text class="daily-hanzi">{{daily.hanzi}}</text><text class="daily-english">{{daily.w}}</text></view>
+      <text class="pinyin">{{daily.pinyin}} · {{daily.zh}}</text>
+    </view>
+  </view>
+
+  <view class="panel" style="margin-top:24rpx">
+    <text class="eyebrow">我的这一周</text>
+    <view class="stats" style="margin-top:20rpx">
+      <view class="stat"><text class="stat-value">{{learned}}</text><text class="stat-label">已点亮</text></view>
+      <view class="stat"><text class="stat-value">{{mastered}}</text><text class="stat-label">记住了</text></view>
+      <view class="stat"><text class="stat-value">48</text><text class="stat-label">全部词卡</text></view>
+    </view>
+    <view style="display:flex;justify-content:space-between;align-items:flex-end;height:130rpx;margin-top:20rpx">
+      <view wx:for="{{week}}" wx:key="label" style="width:12%;text-align:center">
+        <view style="height:90rpx;display:flex;align-items:flex-end;justify-content:center"><view style="width:20rpx;height:{{item.height}}rpx;min-height:8rpx;border-radius:10rpx;background:#cb922c"></view></view>
+        <text class="muted">{{item.label}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view style="margin:30rpx 0"><galaxy words="{{entries}}" cards="{{progress.cards}}" highlight="{{todayIds}}" mini bind:open="openGalaxyWord" /></view>
+
+  <view class="panel">
+    <text class="eyebrow">按主题去发现</text>
+    <view class="topic-grid" style="margin-top:22rpx">
+      <button wx:for="{{topics}}" wx:key="key" class="topic" data-topic="{{item.key}}" bindtap="openTopic">
+        <text class="topic-symbol">{{item.symbol}}</text>
+        <text class="topic-name">{{item.name}}</text>
+        <text class="topic-count">{{item.count}} 张词卡</text>
+      </button>
+    </view>
+  </view>
+</view>
+
+<view wx:if="{{onboard}}" class="onboard">
+  <view class="onboard-card">
+    <text class="eyebrow">欢迎来到芽芽词光</text>
+    <text class="display" style="margin-top:16rpx">一字一画，<text style="display:block">中英一起学。</text></text>
+    <text class="lede">48 张双语词卡，陪你每天进步一点点。</text>
+    <view class="divider" />
+    <text class="field-label">小朋友从哪里出发？</text>
+    <view class="level-grid">
+      <button wx:for="{{levels}}" wx:key="name" class="level-choice {{levelIndex === index ? 'level-active' : ''}}" data-index="{{index}}" bindtap="chooseLevel">
+        <text class="level-name">{{item.name}}</text><text class="level-desc">{{item.desc}}</text>
+      </button>
+    </view>
+    <text class="field-label">每天认识几张新词卡？</text>
+    <view class="chips">
+      <button wx:for="{{[3, 5, 8]}}" wx:key="*this" class="chip {{goal === item ? 'chip-active' : ''}}" data-value="{{item}}" bindtap="chooseGoal">{{item}} 张{{item === 5 ? ' · 推荐' : ''}}</button>
+    </view>
+    <button class="btn btn-primary btn-block" bindtap="finishOnboard">开始小旅程</button>
+    <text class="muted" style="display:block;margin-top:20rpx">不用注册，学习进度只留在这台设备上。</text>
+  </view>
+</view>
