@@ -1,0 +1,38 @@
+{
+  "pages": [
+    "pages/today/index",
+    "pages/atlas/index",
+    "pages/practice/index",
+    "pages/me/index",
+    "pages/learn/index",
+    "pages/word/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "芽芽词光",
+    "navigationBarBackgroundColor": "#F6F1E7",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#F6F1E7",
+    "backgroundTextStyle": "light"
+  },
+  "tabBar": {
+    "color": "#7A7D8A",
+    "selectedColor": "#C4573A",
+    "backgroundColor": "#FFFDF8",
+    "borderStyle": "white",
+    "list": [
+      { "pagePath": "pages/today/index", "text": "今日" },
+      { "pagePath": "pages/atlas/index", "text": "图鉴" },
+      { "pagePath": "pages/practice/index", "text": "练习" },
+      { "pagePath": "pages/me/index", "text": "家长" }
+    ]
+  },
+  "subpackages": [
+    { "root": "media-full", "name": "media-full", "pages": [] },
+    { "root": "media-thumb", "name": "media-thumb", "pages": [] },
+    { "root": "media-zh", "name": "media-zh", "pages": [] },
+    { "root": "media-zh-word", "name": "media-zh-word", "pages": [] },
+    { "root": "media-en", "name": "media-en", "pages": [] }
+  ],
+  "lazyCodeLoading": "requiredComponents",
+  "sitemapLocation": "sitemap.json"
+}

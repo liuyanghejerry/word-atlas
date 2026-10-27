@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "芽芽词光",
+  "usingComponents": {
+    "galaxy": "/components/galaxy/index"
+  }
+}

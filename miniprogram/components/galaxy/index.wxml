@@ -1,0 +1,5 @@
+<view class="galaxy-box {{mini ? 'galaxy-mini' : ''}}" bindtouchstart="touchStart" bindtouchmove="touchMove">
+  <view wx:for="{{labels}}" wx:key="name" class="galaxy-label" style="left:{{item.x}}%;top:{{item.y}}%">{{item.name}}</view>
+  <button wx:for="{{stars}}" wx:key="id" class="star {{item.state}}" style="left:{{item.x}}%;top:{{item.y}}%;background:{{item.color}};color:{{item.color}}" data-id="{{item.id}}" catchtap="open" aria-label="打开词卡" />
+  <view class="galaxy-caption">{{mini ? '每学会一个词，就点亮一颗星' : '拖动旋转 · 点击星星看词卡'}}</view>
+</view>

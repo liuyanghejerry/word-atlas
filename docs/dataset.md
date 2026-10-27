@@ -1,37 +1,57 @@
-# 词库格式 / Dataset format
+# 儿童词库格式 / Kids dataset format
 
-## `data/word-atlas.json`
+当前应用加载 `public/atlas/kids.json`，共 48 张中英双语词卡。
 
-一个数组，按学习路线排序（CEFR 由易到难，同级内打散话题）。每个词条：
+## 数据集元信息
 
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| `id` | string | URL 安全的唯一标识，同时是媒体文件名，例如 `principle`、`day-off` |
-| `w` | string | 词头 |
-| `uk` / `us` | string | 英式 / 美式 IPA，带斜杠 |
-| `senses` | `{pos, zh, en}[]` | 1–3 个义项：词性、中文释义、简明英文释义 |
-| `ex` | `{en, zh}[]` | 两条原创例句：`ex[0]` 日常短句，`ex[1]` 雅思语境长句 |
-| `col` | string[] | 常用搭配，格式 `english｜中文` |
-| `fam` | string[] | 词族，格式 `word (pos)` |
-| `syn` / `ant` | string[] | 近义 / 反义 |
-| `tip` | string | 一条中文用法或辨析提示 |
-| `cefr` | `A1`…`C2` | 估计难度 |
-| `topic` | string | 19 个话题之一：education, work, technology, science, environment, health, society, government, economy, media, arts, travel, city, nature, daily, emotion, thinking, sport, history |
-| `note` | string | 可选：用法提醒（冒犯性、过时用法、拼写说明等） |
+| 字段          | 类型            | 说明                                 |
+| ------------- | --------------- | ------------------------------------ |
+| `id`          | string          | 当前数据集标识，学习进度按此 ID 隔离 |
+| `name`        | string          | 数据集名称                           |
+| `count`       | number          | 词卡数，当前为 48                    |
+| `examples`    | number          | 中英文短句总数，当前为 96            |
+| `illustrated` | number          | 有插画的词卡数                       |
+| `topics`      | `[key, 名称][]` | 6 个主题                             |
+| `levels`      | string[]        | 萌芽、起步、成长 3 个阶段            |
+| `entries`     | object[]        | 按学习路线排列的词卡                 |
 
-## `data/word-atlas.csv`
+## 每张词卡
 
-同样内容的表格版，多值字段用 ` | `、` ; ` 或 `, ` 连接，UTF-8 编码。
+| 字段        | 类型     | 说明                                      |
+| ----------- | -------- | ----------------------------------------- |
+| `id`        | string   | 唯一英文 ID，同时对应原素材库的媒体文件名 |
+| `hanzi`     | string   | 基础汉字或简单词语                        |
+| `pinyin`    | string   | 带声调拼音                                |
+| `w`         | string   | 对应的入门英文词                          |
+| `uk` / `us` | string   | 原始英式 / 美式 IPA；界面只展示 `us`      |
+| `pos`       | string   | 英文词性                                  |
+| `zh`        | string   | 简短中文释义                              |
+| `level`     | number   | `levels` 的从 0 开始索引                  |
+| `topic`     | string   | `topics` 中的 key                         |
+| `zhEx`      | string   | 适合儿童的中文短句                        |
+| `enEx`      | string   | 适合儿童的英文短句                        |
+| `enExZh`    | string   | 英文短句的中文翻译                        |
+| `words`     | string[] | 三个包含目标汉字的中文组词                |
+| `tip`       | string   | 字形、用法或多音字提示                    |
 
-## 网页数据 `public/atlas/`
+## 媒体与语音
 
-- `index.json`：紧凑索引，`words` 中每行为 `[id, word, zh, ipa, cefrIndex, topicIndex, media]`。`media` 是位标记：`1` 插画、`2` 英音、`4` 美音、`8` 例句朗读。
-- `entries/<n>.json`：完整词条，每块 100 条，第 `n` 块对应索引中第 `n*100` 到 `n*100+99` 行。
-- `img/<id>.webp`（512px）、`thumb/<id>.webp`（256px）。
-- `audio/uk/<id>.mp3`、`audio/us/<id>.mp3`、`audio/ex/<id>.mp3`（`ex[0]` 的朗读）。
+词卡通过 `id` 复用原始公开素材：
 
-媒体覆盖情况以 `index.json` 的位标记为准，不要假设每个词都有全部文件。
+- `public/atlas/img/<id>.webp`：512px 插画
+- `public/atlas/thumb/<id>.webp`：256px 缩略图
+- `public/atlas/audio/us/<id>.mp3`：美音单词录音
+
+原始素材库中的英音文件保留用于其他用途，儿童应用不加载。儿童版中文使用随应用提供的普通话合成音频：`audio/zh/<id>.mp3` 为汉字，`audio/zh-ex/<id>.mp3` 为中文短句，`audio/zh-word/<id>-<index>.mp3` 为三个组词。英文短句只使用 `audio/en-us/<id>.mp3`，不读取原 `audio/ex/`，以免录音与新短句不一致。
+
+新增中英文音频可用 `scripts/atlas/generate_kids_audio.py` 重新生成；该内容制作脚本需要可选的 Python `edge-tts` 包，应用运行不依赖 Python 或在线语音服务。
+
+`data/word-atlas.json`、`data/word-atlas.csv`、`public/atlas/index.json` 和 `entries/` 是原雅思项目保留的素材数据，不由儿童版主流程加载。
+
+## 校验
+
+`npm test` 会检查词卡数量、必填字段、ID 和汉字唯一性、主题/阶段分布，以及所有插画、美音录音和中文音频是否存在。
 
 ## 授权
 
-CC BY 4.0，署名 “Word Atlas contributors”。见 [CONTENT_LICENSE.md](../CONTENT_LICENSE.md)。
+原素材及新增儿童内容采用 CC BY 4.0，署名 “Word Atlas contributors”。见 [CONTENT_LICENSE.md](../CONTENT_LICENSE.md)。

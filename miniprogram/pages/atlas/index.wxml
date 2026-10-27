@@ -1,0 +1,47 @@
+<view class="container">
+  <view class="page-head">
+    <text class="eyebrow">双语图鉴 · 48 张词卡</text>
+    <text class="display">一字一画，中英一起学。</text>
+  </view>
+  <view class="search"><text>找</text><input value="{{q}}" bindinput="search" placeholder="搜索汉字、拼音或英文" /><button wx:if="{{q}}" bindtap="clearSearch">×</button></view>
+  <scroll-view scroll-x enhanced show-scrollbar="{{false}}" style="white-space:nowrap">
+    <button class="chip {{!topic ? 'chip-active' : ''}}" data-topic="" bindtap="setTopic">所有主题</button>
+    <button wx:for="{{topics}}" wx:key="key" class="chip {{topic === item.key ? 'chip-active' : ''}}" data-topic="{{item.key}}" bindtap="setTopic">{{item.name}}</button>
+  </scroll-view>
+  <view class="chips">
+    <button class="chip {{level < 0 ? 'chip-active' : ''}}" data-level="-1" bindtap="setLevel">所有阶段</button>
+    <button wx:for="{{levels}}" wx:key="*this" class="chip {{level === index ? 'chip-active' : ''}}" data-level="{{index}}" bindtap="setLevel">{{item}}</button>
+  </view>
+  <view class="chips">
+    <button wx:for="{{statuses}}" wx:key="key" class="chip {{status === item.key ? 'chip-active' : ''}}" data-status="{{item.key}}" bindtap="setStatus">{{item.name}}</button>
+  </view>
+  <view class="actions" style="justify-content:space-between;margin:22rpx 0">
+    <text class="muted">{{list.length}} 个结果</text>
+    <view class="chips" style="margin:0">
+      <button class="chip {{view === 'grid' ? 'chip-active' : ''}}" data-view="grid" bindtap="setView">网格</button>
+      <button class="chip {{view === 'list' ? 'chip-active' : ''}}" data-view="list" bindtap="setView">列表</button>
+      <button class="chip {{view === 'galaxy' ? 'chip-active' : ''}}" data-view="galaxy" bindtap="setView">星图</button>
+    </view>
+  </view>
+  <view wx:if="{{!list.length}}" class="empty">没有找到，换个字词或筛选条件试试。</view>
+  <view wx:elif="{{view === 'galaxy'}}"><galaxy words="{{list}}" cards="{{cards}}" bind:open="open" /></view>
+  <view wx:elif="{{view === 'grid'}}" class="atlas-grid">
+    <button wx:for="{{list}}" wx:key="id" class="tile" data-id="{{item.id}}" bindtap="open">
+      <image src="{{item.image}}" mode="aspectFill" />
+      <view class="tile-body">
+        <text class="tile-level">{{item.levelName}}</text>
+        <text class="tile-hanzi">{{item.hanzi}}</text>
+        <text class="tile-english">{{item.w}}</text>
+        <text class="tile-pinyin">{{item.pinyin}} · {{item.zh}}</text>
+      </view>
+    </button>
+  </view>
+  <view wx:else class="panel">
+    <button wx:for="{{list}}" wx:key="id" class="word-row" data-id="{{item.id}}" bindtap="open">
+      <image src="{{item.image}}" />
+      <view><text class="row-hanzi">{{item.hanzi}}</text><text class="row-pinyin">{{item.pinyin}}</text></view>
+      <view><text class="row-english">{{item.w}}</text><text class="row-pinyin">{{item.zh}}</text></view>
+      <text class="speak-icon">›</text>
+    </button>
+  </view>
+</view>

@@ -24,10 +24,16 @@ export function useGalaxyLayout() {
   }, [atlas]);
 }
 
-const reduced = () => typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+const reduced = () =>
+  typeof matchMedia !== "undefined" &&
+  matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /** Brightness of every star from the learner's memory state. */
-function starStates(layout: GalaxyLayout, cards: Record<string, { st: number; s: number } | undefined>, highlight?: Set<string>) {
+function starStates(
+  layout: GalaxyLayout,
+  cards: Record<string, { st: number; s: number } | undefined>,
+  highlight?: Set<string>,
+) {
   const out = new Float32Array(layout.n);
   layout.ids.forEach((id, i) => {
     if (highlight?.has(id)) out[i] = 3;
@@ -61,7 +67,11 @@ export function Galaxy({
   const canvas = useRef<HTMLCanvasElement>(null);
   const engine = useRef<GalaxyEngine | null>(null);
   const labels = useRef<HTMLDivElement>(null);
-  const [hover, setHover] = useState<{ ref: WordRef; x: number; y: number } | null>(null);
+  const [hover, setHover] = useState<{
+    ref: WordRef;
+    x: number;
+    y: number;
+  } | null>(null);
   const [fallback, setFallback] = useState(false);
   const highlightSet = useMemo(() => new Set(highlight ?? []), [highlight]);
 
@@ -81,7 +91,9 @@ export function Galaxy({
     const ro = new ResizeObserver(() => eng.resize());
     ro.observe(cv);
     // Only animate while visible.
-    const io = new IntersectionObserver(([e]) => (e.isIntersecting && !document.hidden ? eng.start() : eng.stop()));
+    const io = new IntersectionObserver(([e]) =>
+      e.isIntersecting && !document.hidden ? eng.start() : eng.stop(),
+    );
     io.observe(cv);
     const vis = () => (document.hidden ? eng.stop() : eng.start());
     document.addEventListener("visibilitychange", vis);
@@ -117,10 +129,11 @@ export function Galaxy({
     const eng = engine.current;
     if (!eng) return;
     const states = starStates(layout, cards, ignite ? undefined : highlightSet);
-    if (ignite) highlightSet.forEach((id) => {
-      const i = layout.index.get(id);
-      if (i !== undefined) states[i] = 0;
-    });
+    if (ignite)
+      highlightSet.forEach((id) => {
+        const i = layout.index.get(id);
+        if (i !== undefined) states[i] = 0;
+      });
     eng.setStates(states);
   }, [layout, cards, highlightSet, ignite]);
 
@@ -133,12 +146,18 @@ export function Galaxy({
     eng.autoRotate = 0.02;
     const sfx = store.get().settings.sfx;
     const timers = ids.map((id, k) =>
-      window.setTimeout(() => {
-        eng.setState(layout.index.get(id)!, 3);
-        if (sfx && k < 12) void cue("ignite");
-      }, 1400 + k * 180),
+      window.setTimeout(
+        () => {
+          eng.setState(layout.index.get(id)!, 3);
+          if (sfx && k < 12) void cue("ignite");
+        },
+        1400 + k * 180,
+      ),
     );
-    const voice = window.setTimeout(() => sfx && void playFile("voice-galaxy-lit.mp3", 0.9), 1600 + ids.length * 180);
+    const voice = window.setTimeout(
+      () => sfx && void playFile("voice-galaxy-lit.mp3", 0.9),
+      1600 + ids.length * 180,
+    );
     return () => {
       timers.forEach(clearTimeout);
       clearTimeout(voice);
@@ -158,17 +177,27 @@ export function Galaxy({
   useEffect(() => {
     if (mode !== "full") return;
     try {
-      if (localStorage.getItem("word-atlas:galaxy-hello")) return;
-      localStorage.setItem("word-atlas:galaxy-hello", "1");
+      if (localStorage.getItem("little-word-atlas:galaxy-hello")) return;
+      localStorage.setItem("little-word-atlas:galaxy-hello", "1");
     } catch {
       return;
     }
-    const t = window.setTimeout(() => store.get().settings.sfx && void playFile("voice-galaxy-hello.mp3", 0.9), 900);
+    const t = window.setTimeout(
+      () =>
+        store.get().settings.sfx &&
+        void playFile("voice-galaxy-hello.mp3", 0.9),
+      900,
+    );
     return () => clearTimeout(t);
   }, [mode]);
 
   /* ---------- interaction (full mode) ---------- */
-  const drag = useRef<{ x: number; y: number; moved: number; pinch?: number } | null>(null);
+  const drag = useRef<{
+    x: number;
+    y: number;
+    moved: number;
+    pinch?: number;
+  } | null>(null);
   const pointers = useRef(new Map<number, { x: number; y: number }>());
   const lastTwinkle = useRef(0);
   const dwell = useRef(0);
@@ -190,7 +219,8 @@ export function Galaxy({
       if (ps.size === 2) {
         const [a, b] = [...ps.values()];
         const dist = Math.hypot(a.x - b.x, a.y - b.y);
-        if (drag.current?.pinch) eng.cam.dist = clampDist(eng.cam.dist * (drag.current.pinch / dist));
+        if (drag.current?.pinch)
+          eng.cam.dist = clampDist(eng.cam.dist * (drag.current.pinch / dist));
         if (drag.current) drag.current.pinch = dist;
         return;
       }
@@ -199,7 +229,10 @@ export function Galaxy({
         const dy = p.y - prev.y;
         drag.current.moved += Math.abs(dx) + Math.abs(dy);
         eng.cam.yaw -= dx * 0.006;
-        eng.cam.pitch = Math.max(0.12, Math.min(1.45, eng.cam.pitch + dy * 0.005));
+        eng.cam.pitch = Math.max(
+          0.12,
+          Math.min(1.45, eng.cam.pitch + dy * 0.005),
+        );
       }
       return;
     }
@@ -269,7 +302,10 @@ export function Galaxy({
     return () => cv.removeEventListener("wheel", stop);
   }, [mode]);
 
-  const lit = useMemo(() => layout.ids.reduce((n, id) => n + (cards[id] ? 1 : 0), 0), [layout, cards]);
+  const lit = useMemo(
+    () => layout.ids.reduce((n, id) => n + (cards[id] ? 1 : 0), 0),
+    [layout, cards],
+  );
 
   if (mode === "mini")
     return (
@@ -300,15 +336,25 @@ export function Galaxy({
           if (!eng) return;
           if (e.key === "ArrowLeft") eng.cam.yaw -= 0.12;
           if (e.key === "ArrowRight") eng.cam.yaw += 0.12;
-          if (e.key === "ArrowUp") eng.cam.pitch = Math.min(1.45, eng.cam.pitch + 0.08);
-          if (e.key === "ArrowDown") eng.cam.pitch = Math.max(0.12, eng.cam.pitch - 0.08);
-          if (e.key === "+" || e.key === "=") eng.cam.dist = clampDist(eng.cam.dist * 0.85);
+          if (e.key === "ArrowUp")
+            eng.cam.pitch = Math.min(1.45, eng.cam.pitch + 0.08);
+          if (e.key === "ArrowDown")
+            eng.cam.pitch = Math.max(0.12, eng.cam.pitch - 0.08);
+          if (e.key === "+" || e.key === "=")
+            eng.cam.dist = clampDist(eng.cam.dist * 0.85);
           if (e.key === "-") eng.cam.dist = clampDist(eng.cam.dist * 1.18);
         }}
       />
       <div className="galaxy-labels" ref={labels} aria-hidden="true">
         {atlas.topics.map(([key, name], t) => (
-          <span key={key} style={{ "--c": TOPIC_COLORS[t % TOPIC_COLORS.length] } as React.CSSProperties}>
+          <span
+            key={key}
+            style={
+              {
+                "--c": TOPIC_COLORS[t % TOPIC_COLORS.length],
+              } as React.CSSProperties
+            }
+          >
             {name}
           </span>
         ))}
@@ -316,13 +362,23 @@ export function Galaxy({
       {hover && (
         <button
           className="galaxy-tip"
-          style={{ transform: `translate(${Math.min(hover.x + 18, (canvas.current?.clientWidth ?? 0) - 260)}px, ${Math.max(8, hover.y - 46)}px)` }}
+          style={{
+            transform: `translate(${Math.min(hover.x + 18, (canvas.current?.clientWidth ?? 0) - 260)}px, ${Math.max(8, hover.y - 46)}px)`,
+          }}
           onClick={() => openWord(hover.ref.id)}
         >
-          <Illustration src={atlas.img(hover.ref, "thumb")} word={hover.ref.word} topic={hover.ref.topic} />
+          <Illustration
+            src={atlas.img(hover.ref, "thumb")}
+            word={hover.ref.word}
+            topic={hover.ref.topic}
+          />
           <span>
-            <b lang="en">{hover.ref.word}</b>
-            <small>{hover.ref.zh}</small>
+            <b lang="zh-CN">
+              {hover.ref.hanzi} <span lang="en">{hover.ref.word}</span>
+            </b>
+            <small>
+              {hover.ref.pinyin} · {hover.ref.zh}
+            </small>
           </span>
         </button>
       )}
@@ -346,10 +402,26 @@ export function Galaxy({
         </ul>
       </div>
       <div className="galaxy-controls">
-        <button className="icon-btn" onClick={() => engine.current && (engine.current.cam.dist = clampDist(engine.current.cam.dist * 0.8))} aria-label="放大">
+        <button
+          className="icon-btn"
+          onClick={() =>
+            engine.current &&
+            (engine.current.cam.dist = clampDist(engine.current.cam.dist * 0.8))
+          }
+          aria-label="放大"
+        >
           <Plus size={18} />
         </button>
-        <button className="icon-btn" onClick={() => engine.current && (engine.current.cam.dist = clampDist(engine.current.cam.dist * 1.25))} aria-label="缩小">
+        <button
+          className="icon-btn"
+          onClick={() =>
+            engine.current &&
+            (engine.current.cam.dist = clampDist(
+              engine.current.cam.dist * 1.25,
+            ))
+          }
+          aria-label="缩小"
+        >
           <Minus size={18} />
         </button>
         <button
@@ -367,7 +439,8 @@ export function Galaxy({
           className="icon-btn"
           onClick={() => {
             const ids = Object.keys(cards);
-            const pick = ids[Math.floor(Math.random() * ids.length)] ?? atlas.words[0].id;
+            const pick =
+              ids[Math.floor(Math.random() * ids.length)] ?? atlas.words[0].id;
             const i = layout.index.get(pick);
             if (i !== undefined) {
               engine.current?.flyTo(i);
@@ -378,7 +451,13 @@ export function Galaxy({
         >
           <Crosshair size={17} />
         </button>
-        <button className="icon-btn" onClick={() => canvas.current && shareGalaxy(canvas.current, lit, layout.n)} aria-label="分享我的星图">
+        <button
+          className="icon-btn"
+          onClick={() =>
+            canvas.current && shareGalaxy(canvas.current, lit, layout.n)
+          }
+          aria-label="分享我的星图"
+        >
           <Share2 size={17} />
         </button>
       </div>

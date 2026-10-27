@@ -1,13 +1,31 @@
 import type { Atlas } from "../atlas/types";
 import { hashSeed } from "../lib/text";
 
-/** Nineteen star colours, one per IELTS topic, tuned to glow on deep navy. */
+/** Star colours cycle through the child-friendly topic palette. */
 export const TOPIC_COLORS = [
-  "#f2c46d", "#ef8f6b", "#8fd0c8", "#9fb8ff", "#9be38f", "#ff9fa8", "#f7d9a8", "#c6a7ff", "#ffd36b", "#7fc4ff",
-  "#ffb38a", "#86e0b5", "#d8c3a5", "#b5e48c", "#ffe6b0", "#ff8fc3", "#a8d8ff", "#ffcf7a", "#e0b0ff",
+  "#f2c46d",
+  "#ef8f6b",
+  "#8fd0c8",
+  "#9fb8ff",
+  "#9be38f",
+  "#ff9fa8",
+  "#f7d9a8",
+  "#c6a7ff",
+  "#ffd36b",
+  "#7fc4ff",
+  "#ffb38a",
+  "#86e0b5",
+  "#d8c3a5",
+  "#b5e48c",
+  "#ffe6b0",
+  "#ff8fc3",
+  "#a8d8ff",
+  "#ffcf7a",
+  "#e0b0ff",
 ];
 
-const rgb = (hex: string) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
+const rgb = (hex: string) =>
+  [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
 
 /** Deterministic pseudo-random numbers per word, so the galaxy looks the same everywhere. */
 function rand(seed: number) {
@@ -32,10 +50,7 @@ export interface GalaxyLayout {
   topicCenters: [number, number, number][];
 }
 
-/**
- * A spiral galaxy: each IELTS topic owns an arm, easy words sit near the core and
- * the hardest at the rim, so learning visibly travels outward.
- */
+/** Each topic owns an arm; early cards sit near the core and later cards at the rim. */
 export function layoutGalaxy(atlas: Atlas): GalaxyLayout {
   const words = atlas.words;
   const n = words.length;
@@ -50,10 +65,12 @@ export function layoutGalaxy(atlas: Atlas): GalaxyLayout {
   words.forEach((w, i) => {
     const r = rand(hashSeed(w.id));
     const gauss = () => (r() + r() + r() - 1.5) / 1.5;
-    const radius = 0.1 + (w.cefr / 5) * 0.72 + r() * 0.16;
+    const radius =
+      0.1 + (w.cefr / Math.max(1, atlas.cefr.length - 1)) * 0.72 + r() * 0.16;
     const arm = (w.topic / arms) * Math.PI * 2;
     const spread = Math.sqrt(Math.max(0.6, counts[w.topic] / avg));
-    const angle = arm + radius * 3.4 + gauss() * (0.05 + 0.03 / radius) * spread;
+    const angle =
+      arm + radius * 3.4 + gauss() * (0.05 + 0.03 / radius) * spread;
     const thick = 0.05 * (1 - radius * 0.6) * spread;
     positions[i * 3] = Math.cos(angle) * radius;
     positions[i * 3 + 1] = gauss() * thick;
@@ -73,7 +90,11 @@ export function layoutGalaxy(atlas: Atlas): GalaxyLayout {
     index: new Map(words.map((w, i) => [w.id, i])),
     topicCenters: atlas.topics.map((_, t) => {
       const a = (t / arms) * Math.PI * 2 + mid * 3.4;
-      return [Math.cos(a) * mid, 0, Math.sin(a) * mid] as [number, number, number];
+      return [Math.cos(a) * mid, 0, Math.sin(a) * mid] as [
+        number,
+        number,
+        number,
+      ];
     }),
   };
 }
