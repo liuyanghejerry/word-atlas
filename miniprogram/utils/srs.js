@@ -1,4 +1,4 @@
-const { createEmptyCard, fsrs, Rating, State } = require("../vendor/ts-fsrs.cjs");
+const { createEmptyCard, fsrs, Rating, State } = require("../vendor/ts-fsrs.js");
 
 const schedulers = new Map();
 const scheduler = (retention) => {

@@ -2,6 +2,7 @@ const media = require("../../utils/media");
 const audio = require("../../utils/audio");
 
 Component({
+  options: { styleIsolation: "shared" },
   properties: {
     entry: { type: Object, value: null },
     saved: { type: Boolean, value: false },

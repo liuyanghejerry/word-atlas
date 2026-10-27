@@ -30,7 +30,7 @@ def main():
             copy(SOURCE / "audio" / "zh-word" / f"{word_id}-{index}.mp3", TARGET / "media-zh-word" / "audio" / "zh-word" / f"{word_id}-{index}.mp3")
     for name in ["correct", "wrong", "start", "complete", "flip", "twinkle"]:
         copy(ROOT / "public" / "sfx" / f"{name}.mp3", TARGET / "media-en" / "sfx" / f"{name}.mp3")
-    copy(ROOT / "node_modules" / "ts-fsrs" / "dist" / "index.cjs", TARGET / "vendor" / "ts-fsrs.cjs")
+    copy(ROOT / "node_modules" / "ts-fsrs" / "dist" / "index.cjs", TARGET / "vendor" / "ts-fsrs.js")
     license_file = ROOT / "node_modules" / "ts-fsrs" / "LICENSE"
     if license_file.exists():
         copy(license_file, TARGET / "vendor" / "ts-fsrs.LICENSE")

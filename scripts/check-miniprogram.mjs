@@ -22,6 +22,10 @@ for (const page of app.pages) {
       for (const extension of ["js", "json", "wxml", "wxss"]) {
         if (!fs.existsSync(path.join(mini, `${target}.${extension}`))) errors.push(`missing component ${target}.${extension}`);
       }
+      const source = path.join(mini, `${target}.js`);
+      if (fs.existsSync(source) && !/\bstyleIsolation\s*:\s*["']shared["']/.test(fs.readFileSync(source, "utf8"))) {
+        errors.push(`component does not share app styles ${target}`);
+      }
     }
   }
 }
@@ -37,6 +41,9 @@ const walk = (directory, extension, output = []) => {
 for (const file of [...walk(mini, ".js"), ...walk(mini, ".cjs")]) {
   const result = spawnSync(process.execPath, ["--check", file], { encoding: "utf8" });
   if (result.status !== 0) errors.push(`${path.relative(root, file)}: ${result.stderr.trim()}`);
+  if (!file.startsWith(path.join(mini, "tests") + path.sep) && /\brequire\(\s*["'][^"']+\.cjs["']\s*\)/.test(fs.readFileSync(file, "utf8"))) {
+    errors.push(`unsupported Mini Program module extension ${path.relative(root, file)}`);
+  }
 }
 for (const file of walk(mini, ".wxml")) {
   const text = fs.readFileSync(file, "utf8");

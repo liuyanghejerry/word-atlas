@@ -3,6 +3,7 @@ const { isMastered } = require("../../utils/srs");
 
 const COLORS = ["#f2c46d", "#ef8f6b", "#8fd0c8", "#9fb8ff", "#9be38f", "#ff9fa8"];
 Component({
+  options: { styleIsolation: "shared" },
   properties: {
     words: { type: Array, value: [] },
     cards: { type: Object, value: {} },
